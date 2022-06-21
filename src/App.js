@@ -1,25 +1,86 @@
-import logo from './logo.svg';
-import './App.css';
+import {useEffect, useState} from "react";
 
-function App() {
+const tipos = {
+  artifacts:"artefactos",
+  boss:"jefes",
+  characters:"personajes",
+consumables:"Consumibles",
+  domains:"Dominios",
+  elements:"Elementos",
+  enemies:"Enemigos",
+  materials:"Materiales",
+  nations:"Naciones",
+  weapons:"Armas",
+
+};
+
+function App (){
+
+  //almacenar el contenido en un use state
+  const [genshinState, setGenshinState] = useState({
+    types: [],
+  });
+  
+  //solicitud de la api paea guardar en una variable "fetch"
+  //funcion asincrona
+  const fetchGenshinApi = async (item, url = "https://api.genshin.dev/") => {
+    
+    const respuesta = await fetch(url);
+    const respJson = await respuesta.json();
+    if (item === "types") {
+    setGenshinState({
+      ...genshinState,
+      types: respJson.types,
+    });
+  } else{
+    setGenshinState({
+      ...genshinState,
+      [item]: respJson,
+     });
+    }
+  };
+
+  fetchGenshinApi("types");
+
+  const handleChangeType = ({target}) => {
+    const url= `https://api.genshin.dev/${target.value}`;
+  fetchGenshinApi(target.value, url);
+  console.log(genshinState);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  <div className="App">
+    <h1> GENSHI </h1>
+   <hr/>
+   <select name="types" onChange={handleChangeType}>
+<option value=""> seleccione un elemento</option>
+{genshinState.types.map((type) => (
+
+  <option
+  key={type}
+  value={type}>
+  {tipos[type]}
+  </option>
+
+))}
+</select>
+{
+genshinState.artifacts && <select name="artifacts">
+  <option value="">Selecciona un set de artefactos</option>
+  {genshinState.artifacts.map((artifact) => (
+    <option key={artifact} value={artifact}>
+      {artifact}
+    </option>
+  ))}
+</select>
+    
+  }
+  </div>
+    );
 }
+     
+
+
+
 
 export default App;
